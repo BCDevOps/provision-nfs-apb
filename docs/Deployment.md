@@ -19,7 +19,7 @@ confirm /etc/containers/registries.conf has insecure route (if needed)
 - add to [registries.insecure] section:
   `registries = [${OSC_DOCKER_REG}]`
 
-This apb was created with "apb init", and can be pushed via the following (in the top folder):
+This apb was created with "apb init", and can be pushed via the following (from within the backup-pvc-apb folder):
 
 ``` bash
 apb prepare
@@ -99,7 +99,7 @@ Add "nfs-file" storageclass
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: nfs-file
+  name: nfs-backup
 provisioner: no-provisioning
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
