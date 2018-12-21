@@ -5,7 +5,7 @@
 Local package requirements:
 
 - oc client
-- apb cli (https://docs.okd.io/3.10/apb_devel/cli_tooling.html)
+- apb cli [https://docs.okd.io/3.10/apb_devel/cli_tooling.html](https://docs.okd.io/3.10/apb_devel/cli_tooling.html)
 - local docker
 
 `oc login` (as user with cluster-admin)
@@ -39,7 +39,7 @@ If the push shows an error at the bootstrap step, run the following to bootstrap
     svcat sync broker ansible-service-broker
 ```
 
-# Verify apb
+## Verify apb
 
 (note: svcat may take up to 10 minutes to show up due to catalog refresh timer):
 
@@ -51,16 +51,13 @@ svcat get plans | grep backup-pvc
 
 ## Update openshift-ansible-service-broker
 
-Create service account with cluster storage admin role.
+### Deploy openshift-ansible-service-broker and cluster objects
 
-``` bash
-oc create sa {PVServiceAcctName} -n openshift-ansible-service-broker
-oc adm policy add-cluster-role-to-user system:controller:persistent-volume-binder system:serviceaccount:openshift-ansible-service-broker:{PVServiceAcctName}
-```
+Update [deploy/templates/parameters.yaml](../deploy/templates/parameters.yaml) with the appropriate parameter values, and then deploy objects either manually, or via the [deploy/stage.sh](../deploy/stage.sh) script.  (you will need to be logged in with an appropriate cluster user with cluster-admin access)
 
-Ensure service account created on NFS host with SSH Key access and passwordless sudo for ansible automation.
+### Add an opaque secret using the parameter-secret.json.sample as a template
 
-Add an opaque secret using the parameter-secret.json.sample as a template.
+Currently a manual secret creation is still required until the process is refactored to use vaulted secrets.
 
 create secret with : `oc create -f parameter-secret.json`
 (it will base64 encode items listed in "stringData" section, or if you have base64 encoded values, put them in a data section instead)
@@ -82,29 +79,8 @@ stringData:
     "pv_srv_acct_token": {Auth Token for PVServiceAcctName}
 ```
 
-Update cm/broker-config with the following changes:
+Ensure the service account has been created on the NFS host with SSH Key access and passwordless sudo for ansible automation.  `If the broker has not auto-redeployed, then redeploy openshift-ansible-service-broker to use new cm/broker-config and to trigger a scan of the new images`
 
-``` yaml
-Add section:
-  secrets:
-  - title: backup-nfs-auth
-    apb_name: localregistry-backup-pvc-apb
-    secret: {bkup-nfs-param secret name}
-```
+## Test
 
-Add "nfs-file" storageclass
-`(need to refactor as secret variable instead of hard-coded name)`
-
-``` yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: nfs-backup
-provisioner: no-provisioning
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
-```
-
-Redeploy openshift-ansible-service-broker to use new cm/broker-config
-
-Test creating serviceInstance. (Should only see project and size as parameters)
+Test creating serviceInstance through the GUI and you should only see project and size as parameters.
