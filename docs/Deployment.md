@@ -39,16 +39,6 @@ If the push shows an error at the bootstrap step, run the following to bootstrap
     svcat sync broker ansible-service-broker
 ```
 
-## Verify apb
-
-(note: svcat may take up to 10 minutes to show up due to catalog refresh timer):
-
-``` bash
-oc get images -n openshift | grep backup-pvc-apb
-svcat sync broker ansible-service-broker
-svcat get plans | grep backup-pvc
-```
-
 ## Update openshift-ansible-service-broker
 
 ### Deploy openshift-ansible-service-broker and cluster objects
@@ -79,7 +69,26 @@ stringData:
     "pv_srv_acct_token": {Auth Token for PVServiceAcctName}
 ```
 
-Ensure the service account has been created on the NFS host with SSH Key access and passwordless sudo for ansible automation.  `If the broker has not auto-redeployed, then redeploy openshift-ansible-service-broker to use new cm/broker-config and to trigger a scan of the new images`
+Ensure the service account has been created on the NFS host with SSH Key access and passwordless sudo for ansible automation.
+
+## Redeploy openshift-ansible-service-broker
+
+Once all objects have been created appropriately, manually trigger a redeploy of the broker.
+
+``` bash
+oc rollout latest dc/asb -n openshift-ansible-service-broker
+oc rollout status dc/asb -n openshift-ansible-service-broker
+```
+
+## Verify apb
+
+(note: svcat may take up to 10 minutes to show up due to catalog refresh timer):
+
+``` bash
+oc get images -n openshift | grep backup-pvc-apb
+svcat sync broker ansible-service-broker
+svcat get plans | grep backup-pvc
+```
 
 ## Test
 
