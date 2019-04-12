@@ -10,7 +10,18 @@ As a staging area, the nfs-backup StorageClass is not Highly Available and is no
 
 There is a minimum quota of 5Gi and 2 PV's for each project.  This amount was deemed enough to create a proof of concept backup process for your projects.  Once you have a working process within your projects, you may want to request a more appropriate size (if the 5Gi does not meet your needs)  This process is still in development but aims to ensure that your backup process will not introduce problems for the platform or your project.  Reach out in #devops-requests for a backup process review and quota increase once your process is ready.
 
-Maintenance and service issues are announced in #devops-alerts and #devops-operations as with other Pathfinder operational effort.
+Maintenance and service issues for the NFS service are announced in [#devops-alerts](https://chat.pathfinder.gov.bc.ca/channel/devops-alerts) and [#devops-operations](https://chat.pathfinder.gov.bc.ca/channel/devops-operations) as with other Pathfinder operational efforts.
+
+## Enterprise Backup/Restore Requests
+
+Enterprise Backup/Restore requests (including customizing schedules, restores, etc) are currently accessed through normal restore request channels (ie: serviceDesk, 7700)  You will need to include the following information:
+
+``` text
+Server: OCIOPF-P-150.DMZ
+Path: /srv/nfs/oscbkp/{volume-name}
+```
+
+`Volume name is the PVC name without the "bk-" prefix. (or the volume name for your nfs-backup PVC)`
 
 ### Provision via GUI catalog
 
