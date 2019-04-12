@@ -1,12 +1,22 @@
-# Provision NFS PVC for a namespace (backup-pvc-apb)
+# Introduction
 
-Welcome to the NFS Provision workspace.  This apb is designed to fully provision an external (to cluster) nfs share along with the cluster objects (pv/pvc) into a cluster namespace.
+The OpenShift Pathfinder Platform provides several types of storage for use within a project space.  If a project wants to have state data backed up within the BC Government Enterprise backup environment, the nfs-backup storageClass provides a staging area for projects to backup live application data to that will be accessible for team backup and restore requests.
 
-## How to Use
+## Pre-Requisites
+
+As a staging area, the nfs-backup StorageClass is not Highly Available and is not recommended for hosting live application data directly.  The recommended approach is to have a specific (backup?) container that will run a custom application backup.  The [backup-container](https://github.com/bcdevops/backup-container) is a good example to use.
+
+## Availability
+
+There is a minimum quota of 5Gi and 2 PV's for each project.  This amount was deemed enough to create a proof of concept backup process for your projects.  Once you have a working process within your projects, you may want to request a more appropriate size (if the 5Gi does not meet your needs)  This process is still in development but aims to ensure that your backup process will not introduce problems for the platform or your project.  Reach out in #devops-requests for a backup process review and quota increase once your process is ready.
+
+Maintenance and service issues are announced in #devops-alerts and #devops-operations as with other Pathfinder operational effort.
 
 ### Provision via GUI catalog
 
-Simply click on the "BC Gov NFS Storage" catalog item and ensure parameters are entered as needed.  You are not able to specify the name of the serviceInstance when provisioning through the GUI, one will be generated for you.
+The backup volume (via NFS) is not provisioned in the same way that the gluster-file and gluster-block is provisioned.  Instead of provisioning via a claim request, you will order an NFS Volume as a catalog item.  You are not able to specify the name of the final PVC, one will be generated for you.
+
+[Catalog Ordering (GUI)](docs/usage-gui.md)
 
 ### Provision via `svcat cli`
 
@@ -34,9 +44,4 @@ You can tell which PVC is associated with the serviceInstance as the serviceInst
 1. Ensure PVC is not mounted in any pods
 2. Delete ServiceInstance that was provisioned
 
-`Due to a current issue with the Automation-Broker, please inform ocp-lab-ops slack channel ASAP (@jefkel) of errors during a deprovision.  (include project name and ServiceInstance name in the slack message)`
-
-## Other Documentation
-
-- [Deployment](docs/Deployment.md)
-- [Secrets](docs/Secrets.md)
+Due to a current issue with the Automation-Broker, please inform [#devops-sos](https://chat.pathfinder.gov.bc.ca/channel/devops-sos) channel ASAP (@Jeff.arctiq) if you get errors during a deprovision.  (include project name and ServiceInstance name in the message)
